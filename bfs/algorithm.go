@@ -1,58 +1,71 @@
 package bfs
 
 import (
-	"container/list"
-	"strings"
+	"bytes"
 )
 
-func BreadthFirstSearch(tree map[string]Node, root, target string) string {
-	const notFound = "not_found" // default value
+type Graph struct {
+	adjacencyList map[string][]string
+}
 
-	// check if root and target exist in the tree
-	rootNode, rootExists := tree[root]
-	_, targetExists := tree[target]
-	if !rootExists || !targetExists {
-		return notFound
+// NewGraph initializes a new graph
+func NewGraph() *Graph {
+	return &Graph{
+		adjacencyList: make(map[string][]string),
 	}
+}
 
-	// initialize the queue and push the root node
-	q := list.New()
-	q.PushBack(rootNode)
+// AddEdge adds an edge between two people
+func (g *Graph) AddEdge(person1, person2 string) {
+	g.adjacencyList[person1] = append(g.adjacencyList[person1], person2)
+}
 
-	// create a parent map to save the interactions and recreate the path
-	parents := make(map[string]string) // initialize queue
-	parents[root] = ""                 // initialize root without any parents
+// BFS performs Breadth-First Search starting from a given person
+func (g *Graph) BFS(start string) string {
+	visited := make(map[string]bool)
+	queue := []string{start}
+	var result bytes.Buffer
 
-	// while queue has elements, keep iterating
-	for q.Len() > 0 {
-		currentNode := q.Front().Value.(Node) // get first element
-		q.Remove(q.Front())                   // remove first element from queue
+	visited[start] = true
 
-		// compare if node is equals to target
-		if strings.EqualFold(currentNode.Value, target) {
-			// the target has been looked
-			// reconstructing the path
-			var route []string
-			for len(currentNode.Value) > 0 {
-				// recreating route
-				route = append([]string{currentNode.Value}, route...)
-				// changing pointer
-				currentNode.Value = parents[currentNode.Value]
-			}
+	for len(queue) > 0 {
+		person := queue[0]
+		queue = queue[1:]
+		result.WriteString(person + " ")
 
-			// returning path result
-			return strings.Join(route, "->")
-		}
-
-		// iterate neighbors
-		for _, neighbor := range currentNode.Neighbors {
-			// check if the neighbor has not already been visited
-			if _, visited := parents[neighbor]; !visited {
-				parents[neighbor] = currentNode.Value // add neighbor to parents map associated to current node value
-				q.PushBack(tree[neighbor])            // add neighbor to the end of the queue
+		for _, neighbor := range g.adjacencyList[person] {
+			if !visited[neighbor] {
+				visited[neighbor] = true
+				queue = append(queue, neighbor)
 			}
 		}
 	}
+	return result.String()
+}
 
-	return notFound
+func (g *Graph) BFSFind(start, target string) bool {
+	visited := make(map[string]bool)
+	queue := []string{start}
+
+	visited[start] = true
+
+	for len(queue) > 0 {
+		person := queue[0]
+		queue = queue[1:]
+
+		// Jika menemukan orang yang dicari, langsung return true
+		if person == target {
+			return true
+		}
+
+		for _, neighbor := range g.adjacencyList[person] {
+			if !visited[neighbor] {
+				visited[neighbor] = true
+				queue = append(queue, neighbor)
+			}
+		}
+	}
+
+	// Jika tidak ditemukan, return false
+	return false
 }
