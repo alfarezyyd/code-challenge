@@ -61,7 +61,7 @@ func TestBidirectionalBFS(t *testing.T) {
 		start, goal string
 		expected    []string
 	}{
-		{"Kebon Sirih", "Pulo Gadung", []string{"Kebon Sirih", "Bundaran HI", "BNI City", "Dukuh Atas", "Manggarai", "Pasar Rumput"}}, // Jalur dari A ke G
+		{"Kebon Sirih", "Pulo Gadung", []string{"Kebon Sirih", "Bundaran HI", "BNI City", "Dukuh Atas", "Pasar Rumput", "Manggarai", "Flyover Pramuka", "Pasar Genjing", "Pemuda Merdeka", "Pulo Gadung"}}, // Jalur dari A ke G
 	}
 
 	// Loop melalui setiap test case
